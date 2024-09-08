@@ -83,8 +83,24 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
       })
   })
 
-app.get("/api/users/:_id/logs",(req,res) => {
-  
+app.get("/api/users/:_id/logs", async (req, res) => {
+  try {
+    const user = await userConstructor.findById(req.params._id, "username _id"),
+      exercices = await exerciseConstructor.find({ idUser: req.params._id },
+        "description duration date"
+      );
+
+    res.json({
+      username: user.username,
+      count: exercices.length,
+      _id: user.id,
+      log: exercices
+    })
+  }
+  catch (error) {
+    console.error(error);
+  }
+
 })
 /*****************************/
 
