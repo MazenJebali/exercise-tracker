@@ -55,23 +55,24 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
       });
 
     await userConstructor.findById(req.params._id)
-      .then((success) => {
+      .then((successUser) => {
         sample.save()
           .then((success) => {
             console.log("exercise saved");
             res.json({
+              username: successUser.username,
               description: success.description,
               duration: success.duration,
               date: success.date,
-              _id: success._id
+              _id: success.idUser
             })
           })
           .catch(async (error) => {
-            const search = await exerciseConstructor.findOne({ idUser: req.params._id, description: exercice.description }, "_id description duration date");
+            const search = await exerciseConstructor.findOne({ idUser: req.params._id, description: exercice.description }, "description duration date");
 
             if (search) {
               console.log("retrieve exercise data from DB..");
-              res.json(search);
+              res.json({ ...search, ...{ username: successUser.username, _id: successUser.id } });
             }
             else {
               console.error(error);
