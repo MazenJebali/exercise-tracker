@@ -88,22 +88,40 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
 
 app.get("/api/users/:_id/logs", async (req, res) => {
   try {
-    const user = await userConstructor.findById(req.params._id, "username _id"),
-      exercices = await exerciseConstructor.find({ idUser: req.params._id },
-        "description duration date"
-      );
-
-    res.json({
-      username: user.username,
-      count: exercices.length,
-      _id: user.id,
-      log: exercices
-    })
+    const user = await userConstructor.findById(req.params._id, "username _id");
+    let exercices = await exerciseConstructor.find({ idUser: req.params._id },
+      "description duration date"
+    );
+    if (!req.query.from && !req.query.to && !req.query.limit) {
+      res.json({
+        username: user.username,
+        count: exercices.length,
+        _id: user.id,
+        log: exercices
+      })
+    }
+    else {
+      if (req.query.limit) {
+        exercices = exercices.limit(Number(req.query.limit));
+      };
+      if (req.query.from) {
+        exercices = exercices.where('date').gte(req.query.from);
+      };
+      if (req.query.to) {
+        exercices = exercices.where('date').lte(req.query.to);
+      };
+      exercices.exec();
+      res.json({
+        username: user.username,
+        count: exercices.length,
+        _id: user.id,
+        log: exercices
+      })
+    }
   }
   catch (error) {
     console.error(error);
   }
-
 })
 /*****************************/
 
