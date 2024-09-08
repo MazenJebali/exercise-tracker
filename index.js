@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 /******Import models*******/
 const userConstructor = require('./entities/users'),
   exerciseConstructor = require('./entities/exercises');
+const { vary } = require('express/lib/response')
 /*****************************/
 
 app.use(cors())
@@ -89,10 +90,11 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
 app.get("/api/users/:_id/logs", async (req, res) => {
   try {
     const user = await userConstructor.findById(req.params._id, "username _id");
-    let exercices = await exerciseConstructor.find({ idUser: req.params._id },
-      "description duration date"
-    );
+
     if (!req.query.from && !req.query.to && !req.query.limit) {
+      let exercices = await exerciseConstructor.find({ idUser: req.params._id },
+        "description duration date"
+      );
       res.json({
         username: user.username,
         count: exercices.length,
@@ -101,16 +103,30 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       })
     }
     else {
-      if (req.query.limit) {
-        exercices = exercices.limit(Number(req.query.limit));
-      };
+      var filter = {
+        idUser: req.params._id,
+        date: null
+      },
+        dateFilter = {};
+
       if (req.query.from) {
-        exercices = exercices.where('date').gte(req.query.from);
+        dateFilter["$gte"] = new Date(req.query.from);
       };
       if (req.query.to) {
-        exercices = exercices.where('date').lte(req.query.to);
+        dateFilter["$lte"] = new Date(req.query.to);
       };
-      exercices.exec();
+
+      if (req.query.to || req.query.from) {
+        filter.date = dateFilter;
+      };
+
+      let exercices = await exerciseConstructor.find(filter,
+        "description duration date"
+      ).limit((req.query.limit) ? Number(req.query.limit) : 1000).exec();
+
+      console.log(exercices);
+      
+
       res.json({
         username: user.username,
         count: exercices.length,
