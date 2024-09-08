@@ -11,7 +11,7 @@ module.exports = DB.model("exercises", new DB.Schema({
         required: true,
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     }
 }));
