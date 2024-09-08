@@ -51,7 +51,7 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
       sample = new exerciseConstructor({
         description: exercice.description,
         duration: Number(exercice.duration),
-        date: (exercice.date) ? exercice.date : new Date().toDateString(),
+        date: (exercice.date) ? new Date(exercice.date).toDateString() : new Date().toDateString(),
         idUser: req.params._id
       });
 
