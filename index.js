@@ -51,38 +51,41 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
         description: exercice.description,
         duration: Number(exercice.duration),
         date: (exercice.date) ? exercice.date : new Date().toDateString(),
-        _id: req.params._id
+        idUser: req.params._id
       });
-    const userSearch = await userConstructor.findById(req.params._id);
-    if (userSearch) {
-      sample.save()
-        .then((success) => {
-          console.log("exercise saved");
-          res.json({
-            description: success.description,
-            duration: success.duration,
-            date: success.date,
-            _id: success._id
+
+    await userConstructor.findById(req.params._id)
+      .then((success) => {
+        sample.save()
+          .then((success) => {
+            console.log("exercise saved");
+            res.json({
+              description: success.description,
+              duration: success.duration,
+              date: success.date,
+              _id: success._id
+            })
           })
-        })
-        .catch(async (error) => {
-          const search = await exerciseConstructor.findById(req.params._id, "_id description duration date");
+          .catch(async (error) => {
+            const search = await exerciseConstructor.findOne({ idUser: req.params._id, description: exercice.description }, "_id description duration date");
 
-          if (search) {
-            console.log("retrieve exercise data from DB..");
-            res.json(search);
-          }
-          else {
-            console.error(error);
-          }
-        })
-    }
-    else {
-      console.error("user id not found in database!");
-    }
-
+            if (search) {
+              console.log("retrieve exercise data from DB..");
+              res.json(search);
+            }
+            else {
+              console.error(error);
+            }
+          })
+      })
+      .catch((err) => {
+        console.error("user id not found in database!");
+      })
   })
 
+app.get("/api/users/:_id/logs",(req,res) => {
+  
+})
 /*****************************/
 
 const listener = app.listen(process.env.PORT || 3000, () => {
