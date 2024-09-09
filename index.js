@@ -103,29 +103,15 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       })
     }
     else {
-      var filter = {
-        idUser: req.params._id,
-        date: null
-      },
-        dateFilter = {};
-
-      if (req.query.from) {
-        dateFilter["$gte"] = new Date(req.query.from);
-      };
-      if (req.query.to) {
-        dateFilter["$lte"] = new Date(req.query.to);
-      };
-
-      if (req.query.to || req.query.from) {
-        filter.date = dateFilter;
-      };
-
-      let exercices = await exerciseConstructor.find(filter,
+      let exercices = exerciseConstructor.find({ idUser: req.params._id },
         "description duration date"
-      ).limit((req.query.limit) ? Number(req.query.limit) : 1000).exec();
+      );
 
-      console.log(exercices);
-      
+      if (req.query.limit) {
+        exercices = exercices.limit(Number(req.query.limit));
+      }
+
+      exercices = await exercices.exec();
 
       res.json({
         username: user.username,
