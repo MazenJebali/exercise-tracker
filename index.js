@@ -95,6 +95,12 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       let exercices = await exerciseConstructor.find({ idUser: req.params._id },
         "description duration date"
       );
+      exercices = exercices.map(e => ({
+        description: e.description,
+        duration: e.duration,
+        date: e.date.toDateString()
+      }))
+
       res.json({
         username: user.username,
         count: exercices.length,
