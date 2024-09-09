@@ -103,13 +103,36 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       })
     }
     else {
-      let exercices = exerciseConstructor.find({ idUser: req.params._id },
+      let Query = {
+        idUser: req.params._id
+      };
+
+      if (req.query.from) {
+        //exercices = exercices.where('date').gte(new Date(req.query.from));
+        Query.date = {
+          $gte: new Date(req.query.from)
+        }
+      }
+      else if (req.query.to) {
+        //exercices = exercices.where('date').lte(new Date(req.query.to));
+        Query.date = {
+          $lte: new Date(req.query.to)
+        }
+      }
+      else if (req.query.to && req.query.from) {
+        Query.date = {
+          $gte: new Date(req.query.from),
+          $lte: new Date(req.query.to)
+        }
+      };
+
+      let exercices = exerciseConstructor.find(Query,
         "description duration date"
       );
 
       if (req.query.limit) {
         exercices = exercices.limit(Number(req.query.limit));
-      }
+      };
 
       exercices = await exercices.exec();
 
