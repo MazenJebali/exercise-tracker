@@ -14,7 +14,7 @@ const structure = new DB.Schema({
         required: true,
     },
     date: {
-        type: String,
+        type: Date,
         required: true
     }
 })

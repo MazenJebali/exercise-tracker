@@ -51,7 +51,7 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
       sample = new exerciseConstructor({
         description: exercice.description,
         duration: Number(exercice.duration),
-        date: (exercice.date) ? new Date(exercice.date).toDateString() : new Date().toDateString(),
+        date: (exercice.date) ? new Date(exercice.date) : new Date(),
         idUser: req.params._id
       });
 
@@ -65,7 +65,7 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({ extended: true }),
               username: resUser.username,
               description: success.description,
               duration: success.duration,
-              date: success.date,
+              date: success.date.toDateString(),
               _id: success.idUser
             })
           })
@@ -135,6 +135,8 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       };
 
       exercices = await exercices.exec();
+      console.log(Query);
+      
 
       res.json({
         username: user.username,
