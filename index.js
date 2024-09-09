@@ -135,8 +135,12 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       };
 
       exercices = await exercices.exec();
-      console.log(Query);
-      
+
+      exercices = exercices.map(e => ({
+        description: e.description,
+        duration: e.duration,
+        date: e.date.toDateString()
+      }))
 
       res.json({
         username: user.username,
